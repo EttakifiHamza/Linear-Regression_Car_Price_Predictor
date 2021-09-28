@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="{{url_for('static',filename='css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/bootstrap.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='stylesheet/style.css')}}">
+    <title>Car Price Predictor</title>
+</head>
+<body>
+  <h1 class="titre1">Car Price Predictor</h1>
+<form method="POST" action="#">
+  <div class="section">
+    <div class="input-group mb-3" class="option">
+        <div class="input-group-append">
+            <label class="input-group-text" for="company">Company</label>
+        </div>
+        <select class="custom-select" name="companies" required="1" onchange="load_car_models(this.id,'car_model')" id="company">
+             <option selected disabled>Select Companie...</option>
+             {% for company in companies %}
+                <option value='{{company}}'>{{company}}</option>
+             {%endfor %}
+        </select>
+      
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-append">
+            <label class="input-group-text" for="car_model">Model</label>
+        </div>
+        <select class="custom-select"  name="car_model" id="car_model">
+            <option selected disabled>Select Car Mode...</option>
+             {% for car in car_model %}
+                <option value='{{car}}'>{{car}}</option>
+             {%endfor %}
+        </select>
+      
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-append">
+            <label class="input-group-text" for="inputGroupSelect01">Year</label>
+        </div>
+        <select class="custom-select" name="year" id="inputGroupSelect01">
+           <option selected disabled>Select Year...</option>
+             {% for an in year %}
+                <option value='{{an}}'>{{an}}</option>
+             {%endfor %}
+        </select>
+      
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-append">
+            <label class="input-group-text" for="inputGroupSelect02">Type</label>
+        </div>
+        <select class="custom-select" name="fuel_type" id="inputGroupSelect02">
+           <option selected disabled>Select Type...</option>
+             {% for type in fuel_type %}
+                <option value='{{type}}'>{{type}}</option>
+             {%endfor %}
+        </select>
+      
+      </div>
+      <div class="mb-3">
+        <input type="text" name="kilo_driven" class="form-control" id="formGroupExampleInput" style="width: 510px;float: left;" placeholder="Entre the number of Kilometres that the car has travelled">
+      </div>
+      <input type="submit" class="btn btn-primary" onclick="getData()"  value="Predict Price" style="margin-top: 30px;width: 510px;">
+ </div>
+</form>
+    <div class="result">
+        <h1 class="res">Mes Donneés</h1>
+        <div class="reponse"  style="text-align:center">
+            <h3 id="prediction"></h3>
+        </div>
+
+    </div>
+
+
+    <script>
+
+        function load_car_models(id,id_model){
+            var company = document.getElementById(id);
+            var car_model = document.getElementById(id_model);
+            {% for company in companies %}
+                if(company.value == "{{company}}" ){
+                    car_model.innerHTML= "";
+                    car_model.value= "";
+                    {% for model in car_model%}
+                        {% if company in model %}
+                            var newOption = document.createElement("option");
+                            newOption.value = "{{model}}";
+                            newOption.innerHTML = "{{model}}";
+                            car_model.options.add(newOption);
+
+
+                        {% endif %}
+                    {% endfor %}
+                }
+            {% endfor %}
+        }
+
+
+
+        function form_ev(event){
+            event.preventDefault();
+        }
+        function getData(){
+        var formSub = document.querySelector("form")
+            formSub.addEventListener("submit",form_ev);
+            var data = new FormData(formSub);
+
+            var xhr =  new XMLHttpRequest();
+
+            xhr.open("POST","./predict",true);
+            document.getElementById('prediction').innerHTML = "Wait ! Predicting Price..."
+            xhr.onreadystatechange = function () {
+              if(xhr.readyState === 4 && xhr.status === 200) {
+                document.getElementById('prediction').innerHTML = "Prediction : "+xhr.responseText+"MAD"
+              }
+            }
+            xhr.onload = function () {
+
+            };
+            xhr.send(data)
+        }
+    </script>
+
+</body>
+</html>
